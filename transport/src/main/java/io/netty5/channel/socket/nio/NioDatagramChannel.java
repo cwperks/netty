@@ -523,6 +523,8 @@ public final class NioDatagramChannel
         boolean success = false;
         try {
             javaChannel().connect(remoteAddress);
+            // Once connected its bound as well
+            bound = true;
             success = true;
             return true;
         } finally {
