@@ -205,14 +205,16 @@ public class SocketTestPermutation {
     }
     public static DomainSocketAddress newDomainSocketAddress() {
         try {
-            File file;
-            do {
-                file = PlatformDependent.createTempFile("NETTY", "UDS", null);
+            for (int i = 0; i < 10; i++) {
+                File file = PlatformDependent.createTempFile("NETTY", "UDS", null);
                 if (!file.delete()) {
                     throw new IOException("failed to delete: " + file);
                 }
-            } while (file.getAbsolutePath().length() > 128);
-            return new DomainSocketAddress(file);
+                if (file.getAbsolutePath().length() <= 128) {
+                    return new DomainSocketAddress(file);
+                }
+            }
+            throw new IllegalStateException("Could not create temporary file with an absolute path length <= 128");
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
